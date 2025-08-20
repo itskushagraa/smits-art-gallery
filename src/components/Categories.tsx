@@ -15,7 +15,7 @@ const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
 const categories: Category[] = [
     {
         title: "Figurative",
-        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/full.png`,
+        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/full.jpeg`,
         slug: "figurative",
     },
     {
@@ -25,12 +25,12 @@ const categories: Category[] = [
     },
     {   // temporary until clientwork is received
         title: "Abstract",
-        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/full.jpg`,
+        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/full.jpeg`,
         slug: "abstract",
     },
     {
         title: "Prints on Demand",
-        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/full.jpg`,
+        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/full.jpeg`,
         slug: "prints",
     },
 ];

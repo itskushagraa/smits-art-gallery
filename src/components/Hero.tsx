@@ -12,9 +12,9 @@ const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
 // Swap these paths later to any specific "hero" images you want.
 const SLIDES = [
   `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/stargazing/interior.jpeg`,
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/interior.JPG`,
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/interior.JPG`,
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/interior.JPG`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/interior.jpeg`,
 ];
 
 const AUTOPLAY_MS = 3000; // 5s
