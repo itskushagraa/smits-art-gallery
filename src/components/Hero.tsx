@@ -1,25 +1,139 @@
 // components/Hero.tsx
 "use client";
 
+import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
+
+// Reuse category interiors for the hero rotation for now.
+// Swap these paths later to any specific "hero" images you want.
+const SLIDES = [
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/stargazing/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/interior.JPG`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/interior.JPG`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/interior.JPG`,
+];
+
+const AUTOPLAY_MS = 3000; // 5s
+
 export default function Hero() {
+  const router = useRouter();
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const intervalRef = useRef<number | null>(null);
+
+  // Respect reduced motion
+  const prefersReducedMotion = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  }, []);
+
+  // Autoplay
+  useEffect(() => {
+    if (prefersReducedMotion || paused) return;
+    intervalRef.current = window.setInterval(() => {
+      setIndex((i) => (i + 1) % SLIDES.length);
+    }, AUTOPLAY_MS);
+    return () => {
+      if (intervalRef.current) window.clearInterval(intervalRef.current);
+    };
+  }, [paused, prefersReducedMotion]);
+
+  // Keyboard support (←/→)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") setIndex((i) => (i + 1) % SLIDES.length);
+      if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <section
-      className="relative flex min-h-[480px] items-center justify-center bg-cover bg-center bg-no-repeat px-6 py-16"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)), url('/artworks/being-lotus/interior.JPG')",
-      }}
+      className="relative h-[68vh] min-h-[520px] w-full overflow-hidden"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-label="Featured interiors slideshow"
     >
-      <div className="flex max-w-3xl flex-col items-center gap-4 text-center">
-        <h1 className="text-4xl font-serif font-extrabold leading-tight text-white md:text-5xl">
-          SmitsArtStudio – Contemporary Works Across the Globe
+      {/* Slides (stacked, cross-fade) */}
+      <div className="absolute inset-0">
+        {SLIDES.map((src, i) => (
+          <div
+            key={src}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              i === index ? "opacity-100" : "opacity-0"
+            }`}
+            aria-hidden={i !== index}
+          >
+            <Image
+              src={src}
+              alt=""
+              fill
+              priority={i === 0}
+              className="object-cover"
+              sizes="100vw"
+            />
+            {/* Dark gradient for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/40" />
+          </div>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center">
+        <h1 className="font-serif text-4xl font-extrabold leading-tight text-white md:text-6xl">
+          SmitsArtStudio –<br className="hidden md:block" />
+          Contemporary Works Across the Globe
         </h1>
-        <p className="text-sm text-gray-100 md:text-base">
+        <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
           International exhibitions, unique pieces, and commissioned art.
         </p>
-        <button className="mt-4 rounded-lg bg-[#019863] px-5 py-2.5 text-sm font-bold text-[#f8fcfa] transition-colors hover:bg-[#46a080] md:text-base">
+
+        <button
+          onClick={() => router.push("/works")}
+          className="mt-8 rounded-xl bg-[#0ea36b] px-6 py-3 font-medium text-white shadow-lg transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-white/60"
+          aria-label="Explore works"
+        >
           Explore Works
         </button>
+      </div>
+
+      {/* Controls */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex items-center justify-center">
+        <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-black/35 px-3 py-2 backdrop-blur">
+          <button
+            type="button"
+            aria-label="Previous slide"
+            onClick={() => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)}
+            className="rounded-full px-2 py-1 text-white/90 hover:bg-white/10"
+          >
+            ‹
+          </button>
+          <div className="flex gap-2">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => setIndex(i)}
+                className={`h-2 w-2 rounded-full ${
+                  i === index ? "bg-white" : "bg-white/50 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
+            <button
+              type="button"
+              aria-label="Next slide"
+              onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
+              className="rounded-full px-2 py-1 text-white/90 hover:bg-white/10"
+            >
+              ›
+            </button>
+        </div>
       </div>
     </section>
   );
