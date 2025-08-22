@@ -30,7 +30,7 @@ const categories: Category[] = [
     },
     {
         title: "Prints on Demand",
-        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/full.jpeg`,
+        image: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes-of-sand/full.jpeg`,
         slug: "prints",
     },
 ];

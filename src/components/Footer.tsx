@@ -2,46 +2,80 @@
 "use client";
 
 import { Instagram, Mail } from "lucide-react";
-import { SiThreads } from "react-icons/si";
+import { SiThreads, SiEtsy, SiRedbubble, SiPinterest } from "react-icons/si";
 
 export default function Footer() {
-    return (
-        <footer className="flex flex-col items-center justify-center gap-6 bg-[#f8fcfa] px-6 py-10 text-center">
-            {/* Social icons */}
-            <div className="flex gap-6">
-                <a
-                    href="https://www.instagram.com/smitajsharma"
-                    className="text-[#46a080] transition-colors hover:text-[#019863]"
-                    aria-label="Instagram"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <Instagram size={24} />
-                </a>
+  return (
+    <footer className="flex flex-col items-center justify-center gap-6 bg-[#f8fcfa] px-6 py-10 text-center">
+      {/* Social icons */}
+      <div className="flex gap-6">
+        <a
+          href="https://www.instagram.com/smitajsharma"
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Instagram"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Instagram size={24} />
+        </a>
 
-                <a
-                    href="https://www.threads.net/@smitajsharma"
-                    className="text-[#46a080] transition-colors hover:text-[#019863]"
-                    aria-label="Threads"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    <SiThreads className="h-6 w-6" />
-                </a>
+        <a
+          href="https://www.threads.net/@smitajsharma"
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Threads"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiThreads className="h-6 w-6" />
+        </a>
 
-                <a
-                    href="/contact"
-                    className="text-[#46a080] transition-colors hover:text-[#019863]"
-                    aria-label="Email"
-                >
-                    <Mail size={24} />
-                </a>
-            </div>
+        {/* Etsy */}
+        <a
+          href="https://www.etsy.com/shop/smitsartstudio/" // TODO: put your real Etsy shop URL
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Etsy"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiEtsy className="h-6 w-6" />
+        </a>
 
-            {/* Copyright */}
-            <p className="text-sm text-[#46a080]">
-                © {new Date().getFullYear()} SmitsArtStudio. All rights reserved.
-            </p>
-        </footer>
-    );
+        {/* Redbubble */}
+        <a
+          href="https://www.redbubble.com/people/artsmitten/" // TODO: put your real Redbubble URL
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Redbubble"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiRedbubble className="h-6 w-6" />
+        </a>
+
+        {/* Pinterest */}
+        <a
+          href="https://www.pinterest.com/smitsartstudio/" // TODO: put your real Pinterest URL
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Pinterest"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <SiPinterest className="h-6 w-6" />
+        </a>
+
+        {/* Email → Contact page */}
+        <a
+          href="/contact"
+          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          aria-label="Email"
+        >
+          <Mail size={24} />
+        </a>
+      </div>
+
+      {/* Copyright */}
+      <p className="text-sm text-[#46a080]">
+        © {new Date().getFullYear()} SmitsArtStudio. All rights reserved.
+      </p>
+    </footer>
+  );
 }
