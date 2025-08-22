@@ -48,8 +48,10 @@ export default async function ArtworkPage({
         data.price == null ? "Available on request" : `$${data.price.toLocaleString()}`;
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
-            <Header />
+
+        <main className="flex min-h-screen flex-col bg-[#f8fcfa] overflow-x-clip">
+            <div className="md:hidden"><HeaderMobile /></div>
+            <div className="hidden md:block"><Header /></div>
 
             <div className="pt-16 md:pt-20 flex-1 px-6 md:px-20 py-8 md:py-10">
                 <Link
@@ -61,14 +63,16 @@ export default async function ArtworkPage({
 
                 <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
                     {/* Image */}
-                    <MediaCarousel
-                        slides={slides}
-                        alt={data.title}
-                        sold={!available}
-                        maxVh={68}   // cap at ~68% of viewport height
-                        minPx={360}  // never shorter than 360px
-                        maxPx={820}  // never taller than ~820px on huge screens
-                    />
+                    <div className="relative w-full max-w-full overflow-hidden">
+                        <MediaCarousel
+                            slides={slides}
+                            alt={data.title}
+                            sold={!available}
+                            maxVh={68}
+                            minPx={360}
+                            maxPx={820}
+                        />
+                    </div>
 
                     {/* Details */}
                     <section className="flex flex-col">

@@ -1,4 +1,5 @@
 // app/works/page.tsx
+import HeaderMobile from "@/components/HeaderMobile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CategoryPills from "@/components/works/CategoryPills";
@@ -38,7 +39,8 @@ export default async function WorksPage({
 
     return (
         <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
-            <Header />
+            <div className="md:hidden"><HeaderMobile /></div>
+            <div className="hidden md:block"><Header /></div>
             <div className="pt-[72px] flex-1 px-6 md:px-20 py-10">
                 {/* Title row */}
                 <div className="mb-6 flex items-center justify-between">
