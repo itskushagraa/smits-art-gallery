@@ -40,7 +40,7 @@ export default function Card({ artwork }: { artwork: Artwork }) {
       {/* image */}
       <div
         className={`relative aspect-[4/3] ${
-          sold ? "brightness-75 contrast-90 grayscale" : ""
+          sold ? "brightness-70" : ""
         }`}
       >
         <Image
@@ -51,7 +51,7 @@ export default function Card({ artwork }: { artwork: Artwork }) {
           sizes="(max-width:768px) 50vw, (max-width:1280px) 25vw, 20vw"
         />
         {sold && (
-          <span className="absolute right-2 top-2 rounded-full bg-[#dc2626] px-2 py-0.5 text-xs font-medium text-white shadow">
+          <span className="absolute right-2 top-2 rounded-full bg-[#dc2626] px-2.5 py-0.5 text-xs font-medium text-white shadow">
             Sold
           </span>
         )}
