@@ -14,7 +14,13 @@ const sans = Noto_Sans({
     display: "swap",
 });
 
-export const metadata = { title: "SmitsArtStudio" };
+export const metadata = {
+    title: "SmitsArtStudio",
+    description: "Art gallery website",
+    icons: {
+      icon: "/icon.png", // path in public/
+    },
+  };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (

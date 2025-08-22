@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchArtworks } from "@/lib/artworks/fetchArtworks";
 
-// Minimal shape we actually use from fetchArtworks()
 type ArtworkLike = {
   slug: string;
   title?: string;
@@ -29,7 +28,6 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const onlyAvailable = url.searchParams.get("available") === "true";
 
-    // If fetchArtworks has its own type, you can import & use it here.
     const items = (await fetchArtworks({})) as ArtworkLike[];
 
     const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
