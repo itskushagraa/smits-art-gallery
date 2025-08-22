@@ -42,9 +42,6 @@ export default async function ArtworkPage({
 
     const slides = [fullAbs, interiorAbs].filter(Boolean) as string[];
 
-    // Aspect ratio from real dimensions (fallback to 4/3)
-    const aspectRatio = w && h ? `${w} / ${h}` : "4 / 3";
-
     const sizeText = w && h ? `${w}×${h} cm` : null;
     const priceText =
         data.price == null ? "Available on request" : `$${data.price.toLocaleString()}`;

@@ -1,7 +1,7 @@
 // app/contact/page.tsx
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,6 +27,14 @@ const AUTOPLAY_MS = 4000;
 type Purpose = "artwork" | "exhibit" | "other";
 
 export default function ContactPage() {
+    return (
+        <Suspense fallback={null}>
+            <ContactPageInner />
+        </Suspense>
+    );
+}
+
+function ContactPageInner() {
     const [idx, setIdx] = useState(0);
     const [paused, setPaused] = useState(false);
     const [purpose, setPurpose] = useState<Purpose>("artwork");
@@ -71,7 +79,7 @@ export default function ContactPage() {
             aborted = true;
         };
     }, []);
-
+    
     return (
         <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
             <Header />
@@ -125,7 +133,7 @@ export default function ContactPage() {
 
             <Footer />
         </main>
-    );
+    )
 }
 
 function Tabs({ purpose, setPurpose }: { purpose: Purpose; setPurpose: (p: Purpose) => void }) {
@@ -146,14 +154,6 @@ function Tabs({ purpose, setPurpose }: { purpose: Purpose; setPurpose: (p: Purpo
                 <Tab id="exhibit" label="Exhibitions / Commissions" />
                 <Tab id="other" label="Other" />
             </nav>
-        </div>
-    );
-}
-
-function Placeholder({ text }: { text: string }) {
-    return (
-        <div className="rounded-lg border border-dashed border-[#e6f4ef] bg-white p-5 text-sm text-[#0c1c17]/75">
-            {text}
         </div>
     );
 }

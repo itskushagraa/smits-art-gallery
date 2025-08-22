@@ -25,13 +25,15 @@ export default function ArtworkInquiryForm({
     const [selected, setSelected] = useState<ArtworkOption | null>(null);
 
     // 2) Preselect when artworks load or when preselectSlug changes
+    // ArtworkInquiryForm.tsx
     useEffect(() => {
         if (!preselectSlug || !artworks?.length) return;
         const match = artworks.find((a) => a.slug === preselectSlug);
-        if (match && (!selected || selected.slug !== match.slug)) {
+        if (match && selected?.slug !== match.slug) {
             setSelected(match);
         }
-    }, [preselectSlug, artworks]);
+    }, [preselectSlug, artworks, selected]); // ← include `selected`
+
 
     return (
         <form className="grid gap-5">

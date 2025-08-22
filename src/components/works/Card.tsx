@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
 
 export type Artwork = {
   slug: string;

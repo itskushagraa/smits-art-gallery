@@ -11,7 +11,7 @@ export default function MediaCarousel({
   maxVh = 68,   // cap height by viewport (%)
   minPx = 360,  // minimum height in px
   maxPx = 820,  // hard cap on large screens
-  feather = 0.18, // 0–0.4: how much of the edge fades out (18% default)
+  feather = 0.1, // 0–0.4: how much of the edge fades out (18% default)
 }: {
   slides: string[];
   alt?: string;
@@ -88,7 +88,7 @@ export default function MediaCarousel({
             />
           </div>
         ))}
-        
+
         {/* Controls (minimal, glassy) */}
         {uniqSlides.length > 1 && (
           <>
