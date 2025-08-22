@@ -3,6 +3,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import HeaderMobile from "@/components/HeaderMobile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArtworkInquiryForm, { ArtworkOption } from "@/components/contact/ArtworkInquiryForm";
@@ -79,10 +80,11 @@ function ContactPageInner() {
             aborted = true;
         };
     }, []);
-    
+
     return (
         <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
-            <Header />
+            <div className="md:hidden"><HeaderMobile /></div>
+            <div className="hidden md:block"><Header /></div>
 
             {/* Immersive background */}
             <section

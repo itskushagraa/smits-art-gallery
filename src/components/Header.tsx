@@ -2,7 +2,6 @@
 "use client";
 
 import Link from "next/link";
-import { Search } from "lucide-react";
 
 export default function Header() {
   return (
@@ -28,10 +27,6 @@ export default function Header() {
             Contact
           </Link>
         </nav>
-
-        <button className="flex h-9 w-9 items-center justify-center rounded-md bg-[#e6f4ef] text-[#0c1c17] hover:bg-[#d4ece3] transition-colors">
-          <Search size={18} />
-        </button>
       </div>
     </header>
   );
