@@ -11,10 +11,11 @@ const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
 // Reuse category interiors for the hero rotation for now.
 // Swap these paths later to any specific "hero" images you want.
 const SLIDES = [
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/stargazing/interior.jpeg`,
   `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/interior.jpeg`,
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/being-lotus/interior.jpeg`,
-  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/homes/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/mirrors-and-reflections/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/released/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/deja-vu/interior.jpeg`,
+  `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/masquerade/interior.jpeg`,
 ];
 
 const AUTOPLAY_MS = 3000; // 5s

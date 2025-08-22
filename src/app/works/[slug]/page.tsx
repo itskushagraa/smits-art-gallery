@@ -1,7 +1,6 @@
 // app/works/[slug]/page.tsx
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Image from "next/image";
 import Link from "next/link";
 import InfoToolTip from "@/components/InfoToolTip";
 import { notFound } from "next/navigation";
@@ -41,7 +40,7 @@ export default async function ArtworkPage({
     const interiorAbs = resolveImage(interiorUrl);
     const fullAbs = resolveImage(fullUrl);
 
-    const slides = [interiorAbs, fullAbs].filter(Boolean) as string[];
+    const slides = [fullAbs, interiorAbs].filter(Boolean) as string[];
 
     // Aspect ratio from real dimensions (fallback to 4/3)
     const aspectRatio = w && h ? `${w} / ${h}` : "4 / 3";
@@ -123,7 +122,7 @@ export default async function ArtworkPage({
                         {/* Actions */}
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link
-                                href="/contact"
+                                href={`/contact?artwork=${slug}`}
                                 className="rounded-lg bg-[#019863] px-5 py-2 text-sm font-medium text-white shadow hover:brightness-110"
                             >
                                 Inquire
