@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import type { Artwork } from "@/components/works/Card";
 
+
 export type Sort = "price_asc" | "price_desc" | "size_asc" | "size_desc" | "random";
 type Category = "figurative" | "landscape" | "abstract" | "prints";
 
@@ -13,7 +14,6 @@ type DbArtwork = {
   height_cm: number | null;
   price: number | null;
   available: boolean | null;
-  primary_image_url: string | null;
   media: { kind: string; url: string }[] | null;
 };
 
@@ -34,9 +34,9 @@ export async function fetchArtworks(opts: {
   availableOnly?: boolean;
 }): Promise<Artwork[]> {
   let q = supabase
-    .from("artwork") // singular
+    .from("artwork")
     .select(
-      "slug,title,category,description,width_cm,height_cm,price,available,primary_image_url,media"
+      "slug,title,category,description,width_cm,height_cm,price,available,media"
     );
 
   if (opts.category) q = q.eq("category", opts.category);
@@ -54,16 +54,22 @@ export async function fetchArtworks(opts: {
     return [];
   }
 
-  const items: Artwork[] = (data as DbArtwork[]).map((r) => ({
-    slug: r.slug,
-    title: r.title,
-    width_cm: r.width_cm ?? 0,
-    height_cm: r.height_cm ?? 0,
-    price: r.price ?? null,
-    available: (r.available ?? true) === true,
-    interior_image_path: firstInteriorUrl(r.media) ?? undefined,
-    full_image_path: r.primary_image_url ?? undefined,
-  }));
+  const items: Artwork[] = (data as DbArtwork[]).map((r) => {
+    const hasInterior = !!firstInteriorUrl(r.media); // presence check only
+    const fullKey = `${r.slug}/full_1200_wm.webp`;
+    const interiorKey = hasInterior ? `${r.slug}/interior_1200_wm.webp` : undefined;
+  
+    return {
+      slug: r.slug,
+      title: r.title,
+      width_cm: r.width_cm ?? 0,
+      height_cm: r.height_cm ?? 0,
+      price: r.price ?? null,
+      available: (r.available ?? true) === true,
+      full_image_path: fullKey,
+      interior_image_path: interiorKey,
+    };
+  });  
 
   const area = (a: Artwork) => (a.width_cm || 0) * (a.height_cm || 0);
   switch (opts.sort) {

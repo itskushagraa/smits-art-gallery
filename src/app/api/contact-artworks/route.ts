@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { fetchArtworks } from "@/lib/artworks/fetchArtworks";
+import { signedMediaUrl } from "@/lib/mediaUrl";
 
 type ArtworkLike = {
   slug: string;
@@ -30,13 +31,10 @@ export async function GET(req: Request) {
 
     const items = (await fetchArtworks({})) as ArtworkLike[];
 
-    const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
-
     const list = (onlyAvailable ? items.filter(isAvailable) : items).map((a: ArtworkLike) => ({
       slug: a.slug,
       title: a.title ?? a.name ?? a.slug,
-      thumbUrl: `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${a.slug}/full.jpeg`,
+      thumbUrl: signedMediaUrl(`${a.slug}/full_480_wm.webp`, 60),
       available: isAvailable(a),
     }));
 

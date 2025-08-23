@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+import { signedMediaUrl } from "@/lib/mediaUrl";
 
 export type Artwork = {
     slug: string;
@@ -17,12 +16,10 @@ export type Artwork = {
 const TRANSPARENT_PIXEL =
     "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
-function imgUrl(path?: string) {
-    if (!path) return TRANSPARENT_PIXEL;
-    const raw = path.trim();
-    if (/^https?:\/\//i.test(raw)) return raw;     // already absolute
-    const p = raw.replace(/^\/+/, "");             // strip leading slash
-    return `${SUPABASE_URL}/storage/v1/object/public/${p}`;
+function media(key?: string, target: 1600 | 1200 | 800 | 480 = 800, ttl = 60) {
+    if (!key) return TRANSPARENT_PIXEL;
+        const normalized = key.replace(/_(1600|1200|800|480)_/, `_${target}_`);
+        return signedMediaUrl(normalized, ttl);
 }
 
 function fmtPrice(p: number | null) {
@@ -32,8 +29,8 @@ function fmtPrice(p: number | null) {
 
 export default function Card({ artwork }: { artwork: Artwork }) {
     const sold = !artwork.available;
-    const interiorSrc = imgUrl(artwork.interior_image_path || artwork.full_image_path);
-    const fullSrc = imgUrl(artwork.full_image_path || artwork.interior_image_path);
+    const interiorSrc = media(artwork.interior_image_path || artwork.full_image_path, 800);
+    const fullSrc = media(artwork.full_image_path || artwork.interior_image_path, 800);
 
 
     return (

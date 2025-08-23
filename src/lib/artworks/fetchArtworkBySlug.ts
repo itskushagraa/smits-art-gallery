@@ -11,16 +11,13 @@ export type DbArtwork = {
   height_cm: number | null;
   price: number | null;
   available: boolean | null;
-  primary_image_url: string | null;
   media: { kind: string; url: string }[] | null;
 };
 
 export async function fetchArtworkBySlug(slug: string): Promise<DbArtwork | null> {
   const { data, error } = await supabase
     .from("artwork")
-    .select(
-      "slug,title,category,description,width_cm,height_cm,price,available,primary_image_url,media"
-    )
+    .select("slug,title,category,description,width_cm,height_cm,price,available,media")
     .eq("slug", slug)
     .single();
 

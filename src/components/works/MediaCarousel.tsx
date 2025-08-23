@@ -121,18 +121,6 @@ export default function MediaCarousel({
                         >
                             ›
                         </button>
-
-                        <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-2">
-                            {uniqSlides.map((_, d) => (
-                                <button
-                                    key={d}
-                                    onClick={() => setI(d)}
-                                    aria-label={`Go to image ${d + 1}`}
-                                    className={`h-2 w-2 rounded-full ${d === i ? "bg-black/80" : "bg-black/40 hover:bg-black/60"
-                                        }`}
-                                />
-                            ))}
-                        </div>
                     </>
                 )}
             </div>

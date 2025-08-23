@@ -6,56 +6,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSwipeable } from "react-swipeable";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET!;
-
-// Reuse category interiors for the hero rotation for now.
-// Swap these paths later to any specific "hero" images you want.
-const SLIDES = [
-    `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/the-eye/interior.jpeg`,
-    `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/mirrors-and-reflections/interior.jpeg`,
-    `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/released/interior.jpeg`,
-    `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/deja-vu/interior.jpeg`,
-    `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/masquerade/interior.jpeg`,
-];
-
 const AUTOPLAY_MS = 3000; // 5s
 
-export default function Hero() {
+export default function Hero({ slides }: { slides: string[] }) {
     const router = useRouter();
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
     const intervalRef = useRef<number | null>(null);
+    const total = slides?.length ?? 0;
 
-    // Respect reduced motion
-    const prefersReducedMotion = useMemo(() => {
-        if (typeof window === "undefined") return false;
-        return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    }, []);
-
-    // Autoplay
-    useEffect(() => {
-        if (prefersReducedMotion || paused) return;
-        intervalRef.current = window.setInterval(() => {
-            setIndex((i) => (i + 1) % SLIDES.length);
-        }, AUTOPLAY_MS);
-        return () => {
-            if (intervalRef.current) window.clearInterval(intervalRef.current);
-        };
-    }, [paused, prefersReducedMotion]);
-
-    // Keyboard support (←/→)
-    useEffect(() => {
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === "ArrowRight") setIndex((i) => (i + 1) % SLIDES.length);
-            if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length);
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, []);
-
-    const next = () => setIndex((v) => (v + 1) % SLIDES.length);   // use your existing next if you have it
-    const prev = () => setIndex((v) => (v - 1 + SLIDES.length) % SLIDES.length);
+    const next = () => setIndex((v) => (total ? (v + 1) % total : 0));
+    const prev = () => setIndex((v) => (total ? (v - 1 + total) % total : 0));
 
     const swipe = useSwipeable({
         onSwipedLeft: next,
@@ -65,6 +26,40 @@ export default function Hero() {
         trackMouse: true, // set true if you want drag on desktop too
         delta: 10,         // sensitivity
     });
+    
+    // keep index in range if slides change
+    useEffect(() => {
+        if (index >= total) setIndex(0);
+    }, [total, index]);
+
+    // Respect reduced motion
+    const prefersReducedMotion = useMemo(() => {
+        if (typeof window === "undefined") return false;
+        return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    }, []);
+
+    // Autoplay
+    useEffect(() => {
+        if (prefersReducedMotion || paused || total <= 1) return;
+        intervalRef.current = window.setInterval(() => {
+            setIndex((i) => (i + 1) % total);
+        }, AUTOPLAY_MS);
+        return () => {
+            if (intervalRef.current) window.clearInterval(intervalRef.current);
+        };
+    }, [paused, prefersReducedMotion, total]);
+
+    // Keyboard support (←/→)
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "ArrowRight") setIndex((i) => (i + 1) % total);
+            if (e.key === "ArrowLeft") setIndex((i) => (i - 1 + total) % total);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [total]);
+
+    if (total === 0) return null;
 
     return (
         <section
@@ -77,7 +72,7 @@ export default function Hero() {
         >
             {/* Slides (stacked, cross-fade) */}
             <div className="absolute inset-0">
-                {SLIDES.map((src, i) => (
+                {slides.map((src, i) => (
                     <div
                         key={src}
                         className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${i === index ? "opacity-100" : "opacity-0"
@@ -123,13 +118,13 @@ export default function Hero() {
                     <button
                         type="button"
                         aria-label="Previous slide"
-                        onClick={() => setIndex((i) => (i - 1 + SLIDES.length) % SLIDES.length)}
+                        onClick={() => setIndex((i) => (i - 1 + slides.length) % slides.length)}
                         className="rounded-full px-2 py-1 text-white/90 hover:bg-white/10"
                     >
                         ‹
                     </button>
                     <div className="flex gap-2">
-                        {SLIDES.map((_, i) => (
+                        {slides.map((_, i) => (
                             <button
                                 key={i}
                                 aria-label={`Go to slide ${i + 1}`}
@@ -142,7 +137,7 @@ export default function Hero() {
                     <button
                         type="button"
                         aria-label="Next slide"
-                        onClick={() => setIndex((i) => (i + 1) % SLIDES.length)}
+                        onClick={() => setIndex((i) => (i + 1) % slides.length)}
                         className="rounded-full px-2 py-1 text-white/90 hover:bg-white/10"
                     >
                         ›

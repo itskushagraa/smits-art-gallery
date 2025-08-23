@@ -12,4 +12,12 @@ const nextConfig: NextConfig = {
     },
 };
 
+module.exports = {
+    images: {
+      localPatterns: [
+        { pathname: '/api/media/**' }, // allows ?exp=&sig=
+      ],
+    },
+  };
+  
 export default nextConfig;
