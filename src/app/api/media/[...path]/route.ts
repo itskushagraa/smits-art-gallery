@@ -72,7 +72,7 @@ export async function GET(
     const sig = url.searchParams.get("sig") ?? "";
 
     // ----- verification with leeway already ran above
-    let ok = verifySigWithLeeway(objectPath, exp, sig);
+    const ok = verifySigWithLeeway(objectPath, exp, sig);
 
     // If signature didn't pass, allow requests that are clearly from our own site:
     //  - Vercel Image Optimizer (no Referer sometimes)
