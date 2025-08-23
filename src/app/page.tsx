@@ -6,6 +6,8 @@ import Categories from "@/components/Categories";
 import Footer from "@/components/Footer";
 import { signedMediaUrl } from "@/lib/mediaUrl";
 
+export const revalidate = 20;
+
 export default function HomePage() {
   // Server-side: mint short-lived, proxied URLs for interior derivatives
   const slides = [
