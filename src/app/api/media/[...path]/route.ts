@@ -39,14 +39,15 @@ function verifySig(path: string, exp: number, sig: string) {
     const secret = process.env.MEDIA_TOKEN_SECRET;
     if (!secret) return false;
     const now = Math.floor(Date.now() / 1000);
-    if (!Number.isFinite(exp) || exp <= now) return false;
-
+    const SKEW = 15;
+    if (!Number.isFinite(exp) || exp + SKEW <= now) return false;
+  
     const expected = crypto.createHmac("sha256", secret)
-        .update(`${path}|${exp}`)
-        .digest("base64url");
-
+      .update(`${path}|${exp}`)
+      .digest("base64url");
+  
     return timingSafeEqual(sig, expected);
-}
+  }
 
 const allowedPattern = /^[a-z0-9-]+\/(full|interior)_(1600|1200|800|480)_wm\.webp$/i;
 

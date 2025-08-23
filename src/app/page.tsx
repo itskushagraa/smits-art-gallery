@@ -11,11 +11,11 @@ export const revalidate = 20;
 export default function HomePage() {
   // Server-side: mint short-lived, proxied URLs for interior derivatives
   const slides = [
-    signedMediaUrl("the-eye/interior_1200_wm.webp", 60),
-    signedMediaUrl("mirrors-and-reflections/interior_1200_wm.webp", 60),
-    signedMediaUrl("released/interior_1200_wm.webp", 60),
-    signedMediaUrl("deja-vu/interior_1200_wm.webp", 60),
-    signedMediaUrl("masquerade/interior_1200_wm.webp", 60),
+    signedMediaUrl("the-eye/interior_1200_wm.webp", 300),
+    signedMediaUrl("mirrors-and-reflections/interior_1200_wm.webp", 300),
+    signedMediaUrl("released/interior_1200_wm.webp", 300),
+    signedMediaUrl("deja-vu/interior_1200_wm.webp", 300),
+    signedMediaUrl("masquerade/interior_1200_wm.webp", 300),
   ];
 
   return (

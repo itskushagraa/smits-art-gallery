@@ -13,23 +13,23 @@ type Category = {
 const categories: Category[] = [
   {
     title: "Figurative",
-    image: signedMediaUrl("being-lotus/full_1200_wm.webp", 60),
+    image: signedMediaUrl("being-lotus/full_1200_wm.webp", 300),
     slug: "figurative",
   },
   {
     title: "Landscape",
-    image: signedMediaUrl("stargazing/full_1200_wm.webp", 60),
+    image: signedMediaUrl("stargazing/full_1200_wm.webp", 300),
     slug: "landscape",
   },
   {
     // temporary until clientwork is received
     title: "Abstract",
-    image: signedMediaUrl("the-eye/full_1200_wm.webp", 60),
+    image: signedMediaUrl("the-eye/full_1200_wm.webp", 300),
     slug: "abstract",
   },
   {
     title: "Prints on Demand",
-    image: signedMediaUrl("homes-of-sand/full_1200_wm.webp", 60),
+    image: signedMediaUrl("homes-of-sand/full_1200_wm.webp", 300),
     slug: "prints",
   },
 ];
