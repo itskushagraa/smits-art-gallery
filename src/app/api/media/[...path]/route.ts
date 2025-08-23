@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY! // server-only
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 function timingSafeEqual(a: string, b: string) {
@@ -35,19 +35,24 @@ function timingSafeEqual(a: string, b: string) {
     try { return crypto.timingSafeEqual(A, B); } catch { return false; }
 }
 
-function verifySig(path: string, exp: number, sig: string) {
+// Accept links that are up to N seconds past exp (covers tiny drifts, image optimizer latency, etc.)
+const EXPIRED_LEEWAY_SECONDS = 180; // 3 minutes
+
+function verifySigWithLeeway(path: string, exp: number, sig: string) {
     const secret = process.env.MEDIA_TOKEN_SECRET;
     if (!secret) return false;
+
     const now = Math.floor(Date.now() / 1000);
-    const SKEW = 15;
-    if (!Number.isFinite(exp) || exp + SKEW <= now) return false;
-  
-    const expected = crypto.createHmac("sha256", secret)
-      .update(`${path}|${exp}`)
-      .digest("base64url");
-  
+    // must not be older than leeway
+    if (!Number.isFinite(exp) || exp + EXPIRED_LEEWAY_SECONDS < now) return false;
+
+    const expected = crypto
+        .createHmac("sha256", secret)
+        .update(`${path}|${exp}`)
+        .digest("base64url");
+
     return timingSafeEqual(sig, expected);
-  }
+}
 
 const allowedPattern = /^[a-z0-9-]+\/(full|interior)_(1600|1200|800|480)_wm\.webp$/i;
 
@@ -56,7 +61,8 @@ export async function GET(
     ctx: { params: Promise<{ path: string[] }> }
 ) {
     const { path } = await ctx.params;
-    const objectPath = path.join("/"); // e.g. "deja-vu/full_1600_wm.webp"
+    const objectPath = path.join("/"); // e.g. "deja-vu/full_1200_wm.webp"
+
     if (!allowedPattern.test(objectPath)) {
         return NextResponse.json({ error: "Invalid path" }, { status: 400 });
     }
@@ -64,11 +70,32 @@ export async function GET(
     const url = new URL(req.url);
     const exp = Number(url.searchParams.get("exp") ?? 0);
     const sig = url.searchParams.get("sig") ?? "";
-    if (!verifySig(objectPath, exp, sig)) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
 
-    // Rate limit
+    // ----- verification with leeway already ran above
+    let ok = verifySigWithLeeway(objectPath, exp, sig);
+
+    // If signature didn't pass, allow requests that are clearly from our own site:
+    //  - Vercel Image Optimizer (no Referer sometimes)
+    //  - Or Referer matches our origin
+    if (!ok) {
+        const ua = (req.headers.get("user-agent") ?? "").toLowerCase();
+        const referer = req.headers.get("referer") ?? "";
+
+        const isOptimizer = ua.includes("vercel-image-optimization");
+
+        const host = req.nextUrl.host;                       // e.g. www.smitsartstudio.com
+        const proto = req.nextUrl.protocol || "https:";      // http: in dev
+        const myOriginA = `${proto}//${host}`;
+        const myOriginB = process.env.SITE_ORIGIN ?? "";     // optional: set to https://www.smitsartstudio.com
+
+        const isFirstPartyRef =
+            referer.startsWith(myOriginA) || (myOriginB && referer.startsWith(myOriginB));
+
+        if (!(isOptimizer || isFirstPartyRef)) {
+            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+    }
+    // ----- rate limit (unchanged)
     const ip =
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
         req.headers.get("x-real-ip") ||
@@ -80,22 +107,16 @@ export async function GET(
     ]);
 
     if (!resIp.success || !resPath.success) {
-        const resetAt = Math.max(resIp.reset, resPath.reset); // epoch ms
+        const resetAt = Math.max(resIp.reset, resPath.reset);
         const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
         return NextResponse.json(
             { error: "Too many requests" },
-            {
-                status: 429,
-                headers: {
-                    "Retry-After": String(retryAfter),
-                    "Cache-Control": "no-store",
-                },
-            }
+            { status: 429, headers: { "Retry-After": String(retryAfter), "Cache-Control": "no-store" } }
         );
     }
 
-    const { data, error } = await supabase
-        .storage
+    // ----- fetch & return (unchanged)
+    const { data, error } = await supabase.storage
         .from("artworks-derivatives")
         .download(objectPath);
 
@@ -103,7 +124,6 @@ export async function GET(
         return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // after
     const blob = data as Blob;
     return new NextResponse(blob, {
         headers: {
