@@ -8,11 +8,11 @@ import { signedMediaUrl } from "@/lib/mediaUrl";
 export default function ContactPage() {
   // Pre-signed, proxied interior derivatives for the background slideshow
   const slides = [
-    signedMediaUrl("the-eye/interior_1200_wm.webp", 300),
-    signedMediaUrl("mirrors-and-reflections/interior_1200_wm.webp", 300),
-    signedMediaUrl("released/interior_1200_wm.webp", 300),
-    signedMediaUrl("deja-vu/interior_1200_wm.webp", 300),
-    signedMediaUrl("masquerade/interior_1200_wm.webp", 300),
+    signedMediaUrl("the-eye/interior_1200_wm.webp"),
+    signedMediaUrl("mirrors-and-reflections/interior_1200_wm.webp"),
+    signedMediaUrl("released/interior_1200_wm.webp"),
+    signedMediaUrl("deja-vu/interior_1200_wm.webp"),
+    signedMediaUrl("masquerade/interior_1200_wm.webp"),
   ];
 
   return (

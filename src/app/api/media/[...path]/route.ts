@@ -124,12 +124,12 @@ export async function GET(
         return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    const CDN_TTL = Number(process.env.MEDIA_CDN_TTL ?? 604800);
     const blob = data as Blob;
     return new NextResponse(blob, {
         headers: {
             "Content-Type": "image/webp",
-            "Cache-Control": "public, max-age=60, s-maxage=60, stale-while-revalidate=300",
-            "Content-Disposition": `inline; filename="${objectPath.split("/").pop()}"`,
+            "Cache-Control": `public, max-age=86400, s-maxage=${CDN_TTL}, stale-while-revalidate=300`,
             "X-Content-Type-Options": "nosniff",
         },
     });

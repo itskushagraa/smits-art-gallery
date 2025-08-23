@@ -34,7 +34,7 @@ export async function GET(req: Request) {
     const list = (onlyAvailable ? items.filter(isAvailable) : items).map((a: ArtworkLike) => ({
       slug: a.slug,
       title: a.title ?? a.name ?? a.slug,
-      thumbUrl: signedMediaUrl(`${a.slug}/full_480_wm.webp`, 60),
+      thumbUrl: signedMediaUrl(`${a.slug}/full_480_wm.webp`),
       available: isAvailable(a),
     }));
 

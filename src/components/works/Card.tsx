@@ -16,10 +16,10 @@ export type Artwork = {
 const TRANSPARENT_PIXEL =
     "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
-function media(key?: string, target: 1600 | 1200 | 800 | 480 = 800, ttl = 60) {
+function media(key?: string, target: 1600 | 1200 | 800 | 480 = 800) {
     if (!key) return TRANSPARENT_PIXEL;
         const normalized = key.replace(/_(1600|1200|800|480)_/, `_${target}_`);
-        return signedMediaUrl(normalized, ttl);
+        return signedMediaUrl(normalized);
 }
 
 function fmtPrice(p: number | null) {

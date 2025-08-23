@@ -9,7 +9,7 @@ export const revalidate = 20;
 
 export default function AboutPage() {
   // pick whichever interior derivative you like
-  const hero = signedMediaUrl("released/interior_1200_wm.webp", 300);
+  const hero = signedMediaUrl("released/interior_1200_wm.webp");
 
   const NAME = "Smita Sharma";
   const ROLE = "Artist & Founder";

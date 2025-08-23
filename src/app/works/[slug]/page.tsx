@@ -31,8 +31,8 @@ export default async function ArtworkPage({
 
   // Use private, watermarked derivatives via the proxy
   const slides = [
-    signedMediaUrl(`${slug}/full_1600_wm.webp`, 60),
-    ...(hasInterior ? [signedMediaUrl(`${slug}/interior_1600_wm.webp`, 60)] : []),
+    signedMediaUrl(`${slug}/full_1600_wm.webp`),
+    ...(hasInterior ? [signedMediaUrl(`${slug}/interior_1600_wm.webp`)] : []),
   ];
 
   const sizeText = w && h ? `${w}×${h} cm` : null;
