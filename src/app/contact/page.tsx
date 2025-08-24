@@ -16,7 +16,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
+    <main className="flex min-h-screen flex-col bg-[#F3EeE9]">
       <div className="md:hidden"><HeaderMobile /></div>
       <div className="hidden md:block"><Header /></div>
       <ContactPageInner slides={slides} />

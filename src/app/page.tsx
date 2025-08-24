@@ -19,7 +19,7 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fcfa]">
+    <main className="flex min-h-screen flex-col bg-[#F3EeE9]">
       <div className="md:hidden"><HeaderMobile /></div>
       <div className="hidden md:block"><Header /></div>
       <div className="pt-[32px] flex flex-col flex-1">

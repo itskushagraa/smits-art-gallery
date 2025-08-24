@@ -37,7 +37,7 @@ const categories: Category[] = [
 export default function Categories() {
   return (
     <section className="px-6 py-12 md:px-20">
-      <h1 className="mb-4 text-3xl font-serif font-bold text-[#0c1c17]">
+      <h1 className="mb-4 text-3xl font-sans font-light uppercase text-[#0c1c17]">
         Categories
       </h1>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -55,7 +55,7 @@ export default function Categories() {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
-            <p className="z-10 text-base font-serif font-semibold text-white">
+            <p className="z-10 text-base font-sans font-light uppercase text-white">
               {cat.title}
             </p>
           </Link>

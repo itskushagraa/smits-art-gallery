@@ -45,7 +45,7 @@ In her process, to depict the complex emotional landscapes, she employs a delibe
           <div className="h-[220px] md:h-[300px]" />
 
           {/* card (unchanged) */}
-          <article className="relative -mt-12 md:-mt-16 z-10 rounded-2xl bg-white p-6 md:p-8 ring-1 ring-black/10 shadow">
+          <article className="relative -mt-12 md:-mt-16 z-10 rounded-2xl bg-[#F3EeE9] p-6 md:p-8 ring-1 ring-black/10 shadow">
             <div className="grid grid-cols-[96px,1fr] gap-4 md:grid-cols-[120px,1fr] md:gap-6">
               {/* avatar */}
               <div className="relative -mt-10 md:-mt-12 h-24 w-24 md:h-28 md:w-28 overflow-hidden rounded-full ring-2 ring-white shadow">

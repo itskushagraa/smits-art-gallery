@@ -6,12 +6,12 @@ import { SiThreads, SiEtsy, SiRedbubble, SiPinterest } from "react-icons/si";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-center gap-6 bg-[#f8fcfa] px-6 py-10 text-center">
+    <footer className="flex flex-col items-center justify-center gap-6 bg-[#F3EeE9] px-6 py-10 text-center">
       {/* Social icons */}
       <div className="flex gap-6">
         <a
           href="https://www.instagram.com/smitajsharma"
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Instagram"
           target="_blank"
           rel="noopener noreferrer"
@@ -21,7 +21,7 @@ export default function Footer() {
 
         <a
           href="https://www.threads.net/@smitajsharma"
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Threads"
           target="_blank"
           rel="noopener noreferrer"
@@ -32,7 +32,7 @@ export default function Footer() {
         {/* Etsy */}
         <a
           href="https://www.etsy.com/shop/smitsartstudio/" // TODO: put your real Etsy shop URL
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Etsy"
           target="_blank"
           rel="noopener noreferrer"
@@ -43,7 +43,7 @@ export default function Footer() {
         {/* Redbubble */}
         <a
           href="https://www.redbubble.com/people/artsmitten/" // TODO: put your real Redbubble URL
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Redbubble"
           target="_blank"
           rel="noopener noreferrer"
@@ -54,7 +54,7 @@ export default function Footer() {
         {/* Pinterest */}
         <a
           href="https://www.pinterest.com/smitsartstudio/" // TODO: put your real Pinterest URL
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Pinterest"
           target="_blank"
           rel="noopener noreferrer"
@@ -65,7 +65,7 @@ export default function Footer() {
         {/* Email → Contact page */}
         <a
           href="/contact"
-          className="text-[#46a080] transition-colors hover:text-[#019863]"
+          className="text-[#C6A343] transition-colors hover:text-[#019863]"
           aria-label="Email"
         >
           <Mail size={24} />
@@ -73,7 +73,7 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <p className="text-sm text-[#46a080]">
+      <p className="text-sm text-[#C6A343] font-sans font-light">
         © {new Date().getFullYear()} SmitsArtStudio. All rights reserved.
       </p>
     </footer>

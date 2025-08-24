@@ -40,7 +40,7 @@ export default async function ArtworkPage({
     data.price == null ? "Available on request" : `$${data.price.toLocaleString()}`;
 
   return (
-    <main className="flex min-h-screen flex-col bg-[#f8fcfa] overflow-x-clip">
+    <main className="flex min-h-screen flex-col bg-[#F3EeE9] overflow-x-clip">
       <div className="md:hidden"><HeaderMobile /></div>
       <div className="hidden md:block"><Header /></div>
 
@@ -67,7 +67,7 @@ export default async function ArtworkPage({
 
           {/* Details */}
           <section className="flex flex-col">
-            <h1 className="font-serif text-4xl md:text-5xl font-extrabold leading-tight text-[#0c1c17]">
+            <h1 className="font-sans uppercase text-4xl md:text-5xl font-light leading-tight text-[#0c1c17]">
               {data.title}
             </h1>
 

@@ -41,7 +41,7 @@ export default function CategoryPills({ selected }: { selected?: string }) {
             className={
               "whitespace-nowrap rounded-full border px-3 py-1.5 text-sm transition " +
               (active
-                ? "border-transparent bg-[#019863] text-white shadow-sm"
+                ? "border-transparent bg-[#1E3A5F] text-white shadow-sm"
                 : "border-black/10 bg-white text-[#0c1c17] hover:border-[#019863] hover:text-[#019863]")
             }
             aria-pressed={active}

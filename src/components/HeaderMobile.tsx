@@ -25,9 +25,9 @@ export default function HeaderMobile() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[60] border-b border-[#e6f4ef] bg-[#f8fcfa]/80 backdrop-blur md:hidden">
+    <header className="fixed top-0 left-0 right-0 z-[60] border-b border-[#e6f4ef] bg-[#F3EeE9]/80 backdrop-blur md:hidden">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-serif text-xl font-semibold text-[#0c1c17]">
+        <Link href="/" className="font-sans text-2xl font-semibold text-[#0c1c17]">
           SmitsArtStudio
         </Link>
 
@@ -94,7 +94,7 @@ export default function HeaderMobile() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="px-3 py-2 text-[15px] text-[#0c1c17] hover:bg-[#f3f7f5]"
+              className="px-3 py-2 text-[15px] text-[#0c1c17] font-sans uppercase font-light hover:bg-[#f3f7f5]"
             >
               {item.label}
             </Link>

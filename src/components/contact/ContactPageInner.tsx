@@ -79,9 +79,9 @@ function ContactPageInnerImpl({ slides }: { slides: string[] }) {
       </div>
 
       <div className="relative z-10 mx-auto max-w-3xl px-6 py-16 md:px-0 md:py-24">
-        <div className="w-full rounded-xl bg-[#f8fcfa] p-8 shadow-sm ring-1 ring-black/10">
+        <div className="w-full rounded-xl bg-[#F3EeE9] p-8 shadow-sm ring-1 ring-black/10">
           <header className="mb-4">
-            <h1 className="text-3xl font-serif font-bold text-[#0c1c17]">Contact</h1>
+            <h1 className="text-3xl font-sans font-light uppercase text-[#0c1c17]">Contact</h1>
             <p className="mt-2 text-sm text-[#0c1c17]/75">
               For artwork inquiries, exhibitions/commissions, or other questions.
             </p>

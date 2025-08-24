@@ -71,7 +71,7 @@ export default function Card({ artwork }: { artwork: Artwork }) {
             {/* text */}
             <div className="flex items-center justify-between gap-2 px-3 py-3">
                 <div>
-                    <h3 className="line-clamp-1 font-serif text-[15px] font-semibold text-[#0c1c17]">
+                    <h3 className="line-clamp-1 font-sand font-light uppercase text-[15px] text-[#0c1c17]">
                         {artwork.title}
                     </h3>
                     <p className="text-xs text-[#0c1c17]/70">
