@@ -179,7 +179,7 @@ export default function Hero({ slides }: { slides: string[] }) {
           SmitsArtStudio<br className="hidden md:block" />
         </h1>
         <p className="font-sans uppercase font-light mt-4 max-w-4xl text-base text-white/85 md:text-xl">
-          Wholeness through art, spiritual depth, and unique creations
+          Art that embodies wholeness and spiritual resonance through
         </p>
 
         {/* Gradient button cross-fade (unchanged) */}

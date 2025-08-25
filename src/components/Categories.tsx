@@ -13,7 +13,7 @@ type Category = {
 const categories: Category[] = [
   {
     title: "Figurative",
-    image: signedMediaUrl("being-lotus/full_1200_wm.webp"),
+    image: signedMediaUrl("transcendental-dreams/full_1200_wm.webp"),
     slug: "figurative",
   },
   {

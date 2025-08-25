@@ -2,8 +2,8 @@
 import HeaderMobile from "@/components/HeaderMobile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import ContactPageInner from "@/components/contact/ContactPageInner";
 import { signedMediaUrl } from "@/lib/mediaUrl";
+import ContactGate from "@/components/contact/ContactGate";
 
 export default function ContactPage() {
   // Pre-signed, proxied interior derivatives for the background slideshow
@@ -19,7 +19,7 @@ export default function ContactPage() {
     <main className="flex min-h-screen flex-col bg-[#F3EeE9]">
       <div className="md:hidden"><HeaderMobile /></div>
       <div className="hidden md:block"><Header /></div>
-      <ContactPageInner slides={slides} />
+      <ContactGate slides={slides} />
       <Footer />
     </main>
   );
