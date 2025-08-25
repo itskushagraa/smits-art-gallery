@@ -11,7 +11,7 @@ export default function AboutPage() {
   // pick whichever interior derivative you like
   const hero = signedMediaUrl("released/interior_1200_wm.webp");
 
-  const NAME = "Smita Sharma";
+  const NAME = "Smita J Sharma";
   const ROLE = "Artist & Founder";
   const BIO_SHORT =
     "Smita J Sharma is a professional fine art painter living and working in Jaipur, India. Born in the culturally rich state of Rajasthan, her early life was marked by a deep connection with various performing art forms and the natural splendours of her surroundings were the inspiration for her initial foray into different fine art forms.";

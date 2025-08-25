@@ -1,25 +1,24 @@
 import { supabase } from "@/lib/supabase";
 import type { Artwork } from "@/components/works/Card";
 
-
 export type Sort = "price_asc" | "price_desc" | "size_asc" | "size_desc" | "random";
 type Category = "figurative" | "landscape" | "abstract" | "prints";
 
 type DbArtwork = {
   slug: string;
   title: string;
-  category: Category;
-  description: string | null;
+  // category & description not selected anymore (not needed for the grid)
   width_cm: number | null;
   height_cm: number | null;
   price: number | null;
   available: boolean | null;
-  media: { kind: string; url: string }[] | null;
+  // JSONB array; we only need to know if any item has kind === "interior"
+  media: { kind: string; url?: string }[] | null;
 };
 
-function firstInteriorUrl(media: DbArtwork["media"]) {
+function hasInterior(media: DbArtwork["media"]) {
   const arr = Array.isArray(media) ? media : [];
-  return arr.find((m) => m?.kind === "interior" && m?.url)?.url;
+  return arr.some((m) => m?.kind === "interior");
 }
 
 export async function fetchArtworks(opts: {
@@ -35,9 +34,8 @@ export async function fetchArtworks(opts: {
 }): Promise<Artwork[]> {
   let q = supabase
     .from("artwork")
-    .select(
-      "slug,title,category,description,width_cm,height_cm,price,available,media"
-    );
+    // lean payload: only what the grid renders + media presence check
+    .select("slug,title,width_cm,height_cm,price,available,media");
 
   if (opts.category) q = q.eq("category", opts.category);
   if (opts.availableOnly) q = q.eq("available", true);
@@ -55,10 +53,11 @@ export async function fetchArtworks(opts: {
   }
 
   const items: Artwork[] = (data as DbArtwork[]).map((r) => {
-    const hasInterior = !!firstInteriorUrl(r.media); // presence check only
+    const interior = hasInterior(r.media);
+    // Build *derivative keys only*; UI will turn these into public CDN URLs.
     const fullKey = `${r.slug}/full_1200_wm.webp`;
-    const interiorKey = hasInterior ? `${r.slug}/interior_1200_wm.webp` : undefined;
-  
+    const interiorKey = interior ? `${r.slug}/interior_1200_wm.webp` : undefined;
+
     return {
       slug: r.slug,
       title: r.title,
@@ -69,7 +68,7 @@ export async function fetchArtworks(opts: {
       full_image_path: fullKey,
       interior_image_path: interiorKey,
     };
-  });  
+  });
 
   const area = (a: Artwork) => (a.width_cm || 0) * (a.height_cm || 0);
   switch (opts.sort) {

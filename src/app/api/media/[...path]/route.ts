@@ -1,136 +1,75 @@
 // app/api/media/[...path]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
-import { createClient } from "@supabase/supabase-js";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-// Upstash Redis client (reads UPSTASH_REDIS_REST_URL/TOKEN from env)
+// Do NOT export `dynamic = "force-dynamic"`; we want the 308 cached.
+
 const redis = Redis.fromEnv();
 
-// 120 requests / minute per IP (overall)
+// Optional: basic rate limits (only apply on first hit before the redirect is cached)
 const rlIp = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(120, "1 m"),
-    prefix: "rl:media:ip",
+  redis,
+  limiter: Ratelimit.slidingWindow(120, "1 m"),
+  prefix: "rl:media:ip",
 });
-
-// 30 requests / minute per asset path (throttles hotlinking to one file)
 const rlPath = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(30, "1 m"),
-    prefix: "rl:media:path",
+  redis,
+  limiter: Ratelimit.slidingWindow(30, "1 m"),
+  prefix: "rl:media:path",
 });
 
-export const dynamic = "force-dynamic";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-function timingSafeEqual(a: string, b: string) {
-    const A = Buffer.from(a), B = Buffer.from(b);
-    if (A.length !== B.length) return false;
-    try { return crypto.timingSafeEqual(A, B); } catch { return false; }
-}
-
-// Accept links that are up to N seconds past exp (covers tiny drifts, image optimizer latency, etc.)
-const EXPIRED_LEEWAY_SECONDS = 180; // 3 minutes
-
-function verifySigWithLeeway(path: string, exp: number, sig: string) {
-    const secret = process.env.MEDIA_TOKEN_SECRET;
-    if (!secret) return false;
-
-    const now = Math.floor(Date.now() / 1000);
-    // must not be older than leeway
-    if (!Number.isFinite(exp) || exp + EXPIRED_LEEWAY_SECONDS < now) return false;
-
-    const expected = crypto
-        .createHmac("sha256", secret)
-        .update(`${path}|${exp}`)
-        .digest("base64url");
-
-    return timingSafeEqual(sig, expected);
-}
-
+// Only allow derivative variants (prevents originals)
 const allowedPattern = /^[a-z0-9-]+\/(full|interior)_(1600|1200|800|480)_wm\.webp$/i;
 
 export async function GET(
-    req: NextRequest,
-    ctx: { params: Promise<{ path: string[] }> }
+  req: NextRequest,
+  ctx: { params: Promise<{ path: string[] }> }
 ) {
-    const { path } = await ctx.params;
-    const objectPath = path.join("/"); // e.g. "deja-vu/full_1200_wm.webp"
+  const { path } = await ctx.params;
+  const objectPath = path.join("/"); // e.g. "deja-vu/full_1200_wm.webp"
+  if (!allowedPattern.test(objectPath)) {
+    return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+  }
 
-    if (!allowedPattern.test(objectPath)) {
-        return NextResponse.json({ error: "Invalid path" }, { status: 400 });
-    }
+  // Optional lightweight referer check to discourage hotlinking
+  const referer = req.headers.get("referer") ?? "";
+  const host = req.nextUrl.host;
+  const proto = req.nextUrl.protocol || "https:";
+  const myOriginA = `${proto}//${host}`;
+  const myOriginB = process.env.SITE_ORIGIN ?? "";
+  const isFirstPartyRef =
+    referer.startsWith(myOriginA) || (myOriginB && referer.startsWith(myOriginB)) || referer === "";
 
-    const url = new URL(req.url);
-    const exp = Number(url.searchParams.get("exp") ?? 0);
-    const sig = url.searchParams.get("sig") ?? "";
+  if (!isFirstPartyRef) {
+    // Still allow; or return 403 if you want it strict. Keeping permissive avoids false negatives.
+  }
 
-    // ----- verification with leeway already ran above
-    const ok = verifySigWithLeeway(objectPath, exp, sig);
+  // Rate limit (only meaningful on cache miss)
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "0.0.0.0";
+  const [resIp, resPath] = await Promise.all([
+    rlIp.limit(`ip:${ip}`),
+    rlPath.limit(`path:${objectPath}`),
+  ]);
+  if (!resIp.success || !resPath.success) {
+    const resetAt = Math.max(resIp.reset, resPath.reset);
+    const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(retryAfter), "Cache-Control": "no-store" } }
+    );
+  }
 
-    // If signature didn't pass, allow requests that are clearly from our own site:
-    //  - Vercel Image Optimizer (no Referer sometimes)
-    //  - Or Referer matches our origin
-    if (!ok) {
-        const ua = (req.headers.get("user-agent") ?? "").toLowerCase();
-        const referer = req.headers.get("referer") ?? "";
+  // Redirect straight to the PUBLIC Smart CDN object
+  const publicBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artworks-derivatives/`;
+  const target = publicBase + objectPath;
 
-        const isOptimizer = ua.includes("vercel-image-optimization");
-
-        const host = req.nextUrl.host;                       // e.g. www.smitsartstudio.com
-        const proto = req.nextUrl.protocol || "https:";      // http: in dev
-        const myOriginA = `${proto}//${host}`;
-        const myOriginB = process.env.SITE_ORIGIN ?? "";     // optional: set to https://www.smitsartstudio.com
-
-        const isFirstPartyRef =
-            referer.startsWith(myOriginA) || (myOriginB && referer.startsWith(myOriginB));
-
-        if (!(isOptimizer || isFirstPartyRef)) {
-            return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-        }
-    }
-    // ----- rate limit (unchanged)
-    const ip =
-        req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-        req.headers.get("x-real-ip") ||
-        "0.0.0.0";
-
-    const [resIp, resPath] = await Promise.all([
-        rlIp.limit(`ip:${ip}`),
-        rlPath.limit(`path:${objectPath}`),
-    ]);
-
-    if (!resIp.success || !resPath.success) {
-        const resetAt = Math.max(resIp.reset, resPath.reset);
-        const retryAfter = Math.max(1, Math.ceil((resetAt - Date.now()) / 1000));
-        return NextResponse.json(
-            { error: "Too many requests" },
-            { status: 429, headers: { "Retry-After": String(retryAfter), "Cache-Control": "no-store" } }
-        );
-    }
-
-    // ----- fetch & return (unchanged)
-    const { data, error } = await supabase.storage
-        .from("artworks-derivatives")
-        .download(objectPath);
-
-    if (error || !data) {
-        return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-
-    const CDN_TTL = Number(process.env.MEDIA_CDN_TTL ?? 604800);
-    const blob = data as Blob;
-    return new NextResponse(blob, {
-        headers: {
-            "Content-Type": "image/webp",
-            "Cache-Control": `public, max-age=86400, s-maxage=${CDN_TTL}, stale-while-revalidate=300`,
-            "X-Content-Type-Options": "nosniff",
-        },
-    });
+  const TTL = Number(process.env.MEDIA_CDN_TTL ?? 31536000); // cache the redirect up to 1y
+  const res = NextResponse.redirect(target, 308);
+  res.headers.set("Cache-Control", `public, max-age=${TTL}, s-maxage=${TTL}, immutable`);
+  res.headers.set("Vary", "Accept");
+  return res;
 }

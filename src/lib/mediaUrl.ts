@@ -1,15 +1,24 @@
-import crypto from "crypto";
+// src/lib/mediaUrl.ts
 
-const SECRET = process.env.MEDIA_TOKEN_SECRET!;
-const CDN_TTL   = Number(process.env.MEDIA_CDN_TTL ?? 604800);
-const LEEWAY    = Number(process.env.MEDIA_SIG_LEEWAY ?? 300);
+// Public base for the *derivatives* bucket (must be PUBLIC)
+const PUBLIC_BASE =
+  `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/artworks-derivatives`;
 
-export function signedMediaUrl(key: string) {
-  // key like "deja-vu/full_1200_wm.webp"
-  const exp = Math.floor(Date.now() / 1000) + CDN_TTL + LEEWAY; // <<< important
-  const sig = crypto.createHmac("sha256", SECRET)
-    .update(`${key}|${exp}`)
-    .digest("base64url");
+const ALLOWED_KEY = /^[a-z0-9-]+\/(full|interior)_(1600|1200|800|480)_wm\.webp$/i;
 
-  return `/api/media/${key}?exp=${exp}&sig=${sig}`;
+/** Build a stable public URL for a derivative asset. */
+export function mediaUrl(key: string): string {
+  if (!ALLOWED_KEY.test(key)) {
+    throw new Error(`Invalid media key: ${key}`);
+  }
+  return `${PUBLIC_BASE}/${key}`;
 }
+
+/** Back-compat alias so callers don't need refactors right now. */
+export const signedMediaUrl = mediaUrl;
+
+/** Optional helpers to avoid string mistakes elsewhere. */
+export type MediaVariant = "full" | "interior";
+export type MediaWidth = 480 | 800 | 1200 | 1600;
+export const mediaKey = (slug: string, variant: MediaVariant, w: MediaWidth) =>
+  `${slug}/${variant}_${w}_wm.webp`;

@@ -7,7 +7,7 @@ import InfoToolTip from "@/components/InfoToolTip";
 import { notFound } from "next/navigation";
 import { fetchArtworkBySlug } from "@/lib/artworks/fetchArtworkBySlug";
 import MediaCarousel from "@/components/works/MediaCarousel";
-import { signedMediaUrl } from "@/lib/mediaUrl";
+import { mediaUrl, mediaKey } from "@/lib/mediaUrl"; // ← use stable public URLs
 
 export const revalidate = 60;
 
@@ -24,15 +24,13 @@ export default async function ArtworkPage({
   const w = data.width_cm ?? 0;
   const h = data.height_cm ?? 0;
 
-  // If any media entry is marked "interior", include the interior derivative
   const hasInterior =
-    Array.isArray(data.media) &&
-    data.media.some((m) => m?.kind === "interior");
+    Array.isArray(data.media) && data.media.some((m) => m?.kind === "interior");
 
-  // Use private, watermarked derivatives via the proxy
+  // Derivative keys → stable public URLs (no originals, no proxy)
   const slides = [
-    signedMediaUrl(`${slug}/full_1600_wm.webp`),
-    ...(hasInterior ? [signedMediaUrl(`${slug}/interior_1600_wm.webp`)] : []),
+    mediaUrl(mediaKey(slug, "full", 1600)),
+    ...(hasInterior ? [mediaUrl(mediaKey(slug, "interior", 1600))] : []),
   ];
 
   const sizeText = w && h ? `${w}×${h} cm` : null;
@@ -47,6 +45,7 @@ export default async function ArtworkPage({
       <div className="pt-16 md:pt-20 flex-1 px-6 md:px-20 py-8 md:py-10">
         <Link
           href="/works"
+          prefetch={false} // avoid eager route prefetch; no impact on Storage egress but keeps things lean
           className="mb-6 inline-flex items-center gap-2 text-sm text-[#019863] hover:underline"
         >
           ← Back to Works
@@ -56,7 +55,7 @@ export default async function ArtworkPage({
           {/* Image */}
           <div className="relative w-full max-w-full overflow-hidden">
             <MediaCarousel
-              slides={slides}
+              slides={slides}        // same transitions; URLs are stable public CDN
               alt={data.title}
               sold={!available}
               maxVh={68}

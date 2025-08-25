@@ -6,19 +6,17 @@ import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import { useSwipeable } from "react-swipeable";
 
-const AUTOPLAY_MS = 3000;
+const AUTOPLAY_MS = 4000;
+const TRANSPARENT_PIXEL =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="; // ★
 
-// --- tiny cache so we don't recompute a slide's colors repeatedly
 const gradCache = new Map<string, string>();
 
-// Build a pleasant CSS gradient string from two colors
 function gradient(c1: string, c2: string) {
   return `linear-gradient(135deg, ${c1} 0%, ${c2} 100%)`;
 }
 
-// Quick+robust color sampler
 async function gradientFromImage(src: string): Promise<string> {
-  // cache
   const hit = gradCache.get(src);
   if (hit) return hit;
 
@@ -26,7 +24,6 @@ async function gradientFromImage(src: string): Promise<string> {
   if (!res.ok) throw new Error("image fetch failed");
   const blob = await res.blob();
 
-  // use a DOM <img> to avoid Next/Image type conflicts
   const img = document.createElement("img");
   const url = URL.createObjectURL(blob);
   await new Promise<void>((resolve, reject) => {
@@ -35,7 +32,6 @@ async function gradientFromImage(src: string): Promise<string> {
     img.src = url;
   });
 
-  // downsample to keep it fast, compute two palette anchors
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
   const S = 32;
@@ -44,7 +40,6 @@ async function gradientFromImage(src: string): Promise<string> {
   ctx.drawImage(img, 0, 0, S, S);
   URL.revokeObjectURL(url);
 
-  // accumulate
   let r1 = 0, g1 = 0, b1 = 0, n1 = 0;
   let r2 = 0, g2 = 0, b2 = 0, n2 = 0;
   const data = ctx.getImageData(0, 0, S, S).data;
@@ -53,7 +48,6 @@ async function gradientFromImage(src: string): Promise<string> {
     for (let x = 0; x < S; x++) {
       const i = (y * S + x) * 4;
       const r = data[i], g = data[i + 1], b = data[i + 2];
-      // split roughly by brightness to get two distinct anchors
       const l = 0.299 * r + 0.587 * g + 0.114 * b;
       if (l < 140) { r1 += r; g1 += g; b1 += b; n1++; }
       else { r2 += r; g2 += g; b2 += b; n2++; }
@@ -75,10 +69,9 @@ export default function Hero({ slides }: { slides: string[] }) {
   const intervalRef = useRef<number | null>(null);
   const total = slides?.length ?? 0;
 
-  // --- button gradient crossfade state (two layers A/B)
-  const [gradA, setGradA] = useState<string>(gradient("#374151", "#6B7280")); // neutral fallback
+  const [gradA, setGradA] = useState<string>(gradient("#374151", "#6B7280"));
   const [gradB, setGradB] = useState<string>(gradient("#374151", "#6B7280"));
-  const [showA, setShowA] = useState(true); // which layer is visible
+  const [showA, setShowA] = useState(true);
 
   const next = () => setIndex((v) => (total ? (v + 1) % total : 0));
   const prev = () => setIndex((v) => (total ? (v - 1 + total) % total : 0));
@@ -92,18 +85,15 @@ export default function Hero({ slides }: { slides: string[] }) {
     delta: 10,
   });
 
-  // keep index in range if slides change
   useEffect(() => {
     if (index >= total) setIndex(0);
   }, [total, index]);
 
-  // reduced motion
   const prefersReducedMotion = useMemo(() => {
     if (typeof window === "undefined") return false;
     return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
   }, []);
 
-  // autoplay
   useEffect(() => {
     if (prefersReducedMotion || paused || total <= 1) return;
     intervalRef.current = window.setInterval(() => {
@@ -114,7 +104,6 @@ export default function Hero({ slides }: { slides: string[] }) {
     };
   }, [paused, prefersReducedMotion, total]);
 
-  // keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") setIndex((i) => (i + 1) % total);
@@ -124,7 +113,6 @@ export default function Hero({ slides }: { slides: string[] }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [total]);
 
-  // compute gradient for current slide, then crossfade between A/B
   useEffect(() => {
     if (!slides?.[index]) return;
 
@@ -133,18 +121,14 @@ export default function Hero({ slides }: { slides: string[] }) {
       try {
         const g = await gradientFromImage(slides[index]);
         if (aborted) return;
-        // write into the hidden layer, then flip visibility -> smooth crossfade
         if (showA) {
           setGradB(g);
-          // allow layout to paint before flipping opacity
           requestAnimationFrame(() => setShowA(false));
         } else {
           setGradA(g);
           requestAnimationFrame(() => setShowA(true));
         }
-      } catch {
-        // ignore – keep previous gradient
-      }
+      } catch {}
     })();
 
     return () => { aborted = true; };
@@ -152,6 +136,11 @@ export default function Hero({ slides }: { slides: string[] }) {
   }, [index, slides]);
 
   if (total === 0) return null;
+
+  // ★ Only load the current and the immediate next slide; others are a transparent 1px.
+  const nextIndex = (index + 1) % total;
+  const srcFor = (i: number) =>
+    i === index || i === nextIndex ? slides[i] : TRANSPARENT_PIXEL;
 
   return (
     <section
@@ -171,53 +160,50 @@ export default function Hero({ slides }: { slides: string[] }) {
             aria-hidden={i !== index}
           >
             <NextImage
-              src={src}
+              src={srcFor(i)}                // ★ stable transitions; non-active use 1×1
               alt=""
               fill
-              priority={i === 0}
+              unoptimized                    // ★ hit Supabase Smart CDN directly
+              priority={i === index}         // ★ only active slide is eager
               className="object-cover"
               sizes="100vw"
             />
-            {/* Dark gradient for text legibility */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/25 to-black/40" />
           </div>
         ))}
       </div>
 
-      {/* Content */}
+      {/* Content (unchanged) */}
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center">
         <h1 className="font-sans text-4xl font-light leading-tight uppercase text-white md:text-6xl">
           SmitsArtStudio<br className="hidden md:block" />
         </h1>
         <p className="font-sans uppercase font-light mt-4 max-w-4xl text-base text-white/85 md:text-xl">
-            Wholeness through art, spiritual depth, and unique creations
+          Wholeness through art, spiritual depth, and unique creations
         </p>
 
-        {/* Gradient button with cross-fade between two layers */}
+        {/* Gradient button cross-fade (unchanged) */}
         <button
           onClick={() => router.push("/works")}
           className="relative mt-8 overflow-hidden rounded-xl px-6 py-3 font-extralight uppercase text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-white/60"
           aria-label="Explore works"
           style={{ background: "transparent" }}
         >
-          {/* Layer A */}
           <span
             className={`absolute inset-0 rounded-xl transition-opacity duration-700 ease-in-out ${showA ? "opacity-100" : "opacity-0"}`}
             style={{ background: gradA }}
             aria-hidden
           />
-          {/* Layer B */}
           <span
             className={`absolute inset-0 rounded-xl transition-opacity duration-700 ease-in-out ${showA ? "opacity-0" : "opacity-100"}`}
             style={{ background: gradB }}
             aria-hidden
           />
-          {/* Label */}
           <span className="relative z-10">Explore Works</span>
         </button>
       </div>
 
-      {/* Controls */}
+      {/* Controls (unchanged) */}
       <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex items-center justify-center">
         <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-black/35 px-3 py-2 backdrop-blur">
           <button
