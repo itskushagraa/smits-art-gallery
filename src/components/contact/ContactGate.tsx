@@ -71,11 +71,24 @@ export default function ContactGate({ slides }: { slides: string[] }) {
     }, []);
 
     useEffect(() => {
-        if (verified) return;                           
+        if (verified) return;
         if (!siteKey) return;
         if (typeof window === "undefined" || !window.turnstile) return;
         if (!managedHostRef.current) return;
-        if (managedIdRef.current) return;          
+        if (managedIdRef.current) return;
+
+        // Ensure host is "clean" so auto-render can't also attach a widget
+        try {
+            managedHostRef.current.removeAttribute("class");
+            managedHostRef.current.removeAttribute("data-sitekey");
+            managedHostRef.current.removeAttribute("data-theme");
+            managedHostRef.current.removeAttribute("data-refresh-expired");
+            managedHostRef.current.removeAttribute("data-callback");
+            managedHostRef.current.removeAttribute("data-expired-callback");
+            managedHostRef.current.removeAttribute("data-error-callback");
+            managedHostRef.current.innerHTML = "";
+        } catch { }
+
 
         try {
             managedIdRef.current = window.turnstile.render(managedHostRef.current, {
@@ -160,25 +173,7 @@ export default function ContactGate({ slides }: { slides: string[] }) {
 
     return (
         <>
-            <Script
-                src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-                strategy="afterInteractive"
-                onLoad={() => {
-                    if (!managedIdRef.current && managedHostRef.current && !verified && siteKey && window.turnstile) {
-                        try {
-                            managedIdRef.current = window.turnstile.render(managedHostRef.current, {
-                                sitekey: siteKey,
-                                theme: "auto",
-                                refreshExpired: "auto",
-                                callback: (t: string) => window.onTurnstileVerify?.(t),
-                                "expired-callback": () => window.onTurnstileExpired?.(),
-                                "error-callback": () => window.onTurnstileError?.(),
-                            });
-                        } catch { }
-                    }
-                }}
-            />
-
+           <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" />
             {!verified && (
                 <div className="mx-auto max-w-xl py-24">
                     <h1 className="mb-4 text-2xl font-semibold text-[#0c1c17]">Verify you’re not a bot</h1>
