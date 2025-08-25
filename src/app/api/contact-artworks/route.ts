@@ -17,13 +17,9 @@ function isAvailable(a: ArtworkLike): boolean {
   if ("isSold" in a && typeof a.isSold === "boolean") return a.isSold === false;
   if ("available" in a && typeof a.available === "boolean") return a.available !== false;
   if ("status" in a && typeof a.status === "string") return a.status.toLowerCase() !== "sold";
-  return true; // if no flag, assume available
+  return true;
 }
 
-/**
- * GET /api/contact-artworks[?available=true]
- * Returns: { items: Array<{ slug: string; title: string; thumbUrl: string; available: boolean }> }
- */
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);

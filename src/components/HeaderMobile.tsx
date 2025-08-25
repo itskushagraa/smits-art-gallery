@@ -16,7 +16,6 @@ export default function HeaderMobile() {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
 
-  // Close on route change / Esc / click outside
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -65,7 +64,6 @@ export default function HeaderMobile() {
         </button>
       </div>
 
-      {/* overlay FADE (kept mounted so it can animate) */}
       <button
         aria-hidden
         tabIndex={-1}
@@ -77,7 +75,6 @@ export default function HeaderMobile() {
         ].join(" ")}
       />
 
-      {/* menu POP (scale + translate + fade) */}
       <div
         aria-hidden={!open}
         className={[

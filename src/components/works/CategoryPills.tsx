@@ -23,7 +23,6 @@ export default function CategoryPills({ selected }: { selected?: string }) {
       const next = new URLSearchParams(params.toString());
       if (!value) next.delete("category");
       else next.set("category", value);
-      // when category changes, reset pagination cursor
       next.delete("cursor");
       router.push(`${pathname}?${next.toString()}`, { scroll: true });
     },

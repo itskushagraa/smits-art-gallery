@@ -8,7 +8,7 @@ export const metadata = {
     title: "SmitsArtStudio",
     description: "Art Gallery Website",
     icons: {
-        icon: "/icon.png", // path in public/
+        icon: "/icon.png",
     },
 };
 

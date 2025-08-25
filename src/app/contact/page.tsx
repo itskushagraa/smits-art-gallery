@@ -1,4 +1,3 @@
-// app/contact/page.tsx
 import HeaderMobile from "@/components/HeaderMobile";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,7 +5,6 @@ import { signedMediaUrl } from "@/lib/mediaUrl";
 import ContactGate from "@/components/contact/ContactGate";
 
 export default function ContactPage() {
-  // Pre-signed, proxied interior derivatives for the background slideshow
   const slides = [
     signedMediaUrl("the-eye/interior_1200_wm.webp"),
     signedMediaUrl("mirrors-and-reflections/interior_1200_wm.webp"),

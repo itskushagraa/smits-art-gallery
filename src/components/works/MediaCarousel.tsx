@@ -9,12 +9,12 @@ export default function MediaCarousel({
   slides,
   alt = "",
   sold = false,
-  maxVh = 68,   // cap height by viewport (%)
-  minPx = 360,  // minimum height in px
-  maxPx = 820,  // hard cap on large screens
-  feather = 0.1, // 0–0.4: how much of the edge fades out
+  maxVh = 68, 
+  minPx = 360, 
+  maxPx = 820, 
+  feather = 0.1,
 }: {
-  slides: string[]; // expected as derivative KEYS (e.g., "deja-vu/full_1200_wm.webp") or full URLs
+  slides: string[];
   alt?: string;
   sold?: boolean;
   maxVh?: number;
@@ -27,7 +27,6 @@ export default function MediaCarousel({
     [slides]
   );
 
-  // Resolve to stable public CDN URLs (keys -> URL, URLs pass through)
   const resolvedSlides = useMemo(
     () =>
       uniqSlides.map((s) => (/^https?:\/\//i.test(s) ? s : mediaUrl(s))),
@@ -49,7 +48,6 @@ export default function MediaCarousel({
     delta: 10,
   });
 
-  // keyboard nav
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!len) return;
@@ -58,7 +56,6 @@ export default function MediaCarousel({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [len]);
 
   const boxStyle: React.CSSProperties = {
@@ -76,11 +73,9 @@ export default function MediaCarousel({
     );
   }
 
-  // Feathered mask: solid center -> transparent edges
   const solidPct = Math.max(0, Math.min(100, Math.round((1 - feather) * 100)));
   const mask = `radial-gradient(ellipse at center, black ${solidPct}%, transparent 100%)`;
 
-  // Optional: light prefetch on control hover (no eager network otherwise)
   const prefetch = (idx: number) => {
     const url = resolvedSlides[(idx + len) % len];
     if (!url) return;
@@ -97,7 +92,6 @@ export default function MediaCarousel({
       style={{ ...boxStyle, touchAction: "pan-y" }}
       {...swipe}
     >
-      {/* Feathered stage */}
       <div
         className="relative h-full w-full"
         style={{
@@ -105,7 +99,6 @@ export default function MediaCarousel({
           maskImage: mask,
         }}
       >
-        {/* Render ONLY the active slide to avoid loading all images */}
         <Image
           key={currentSrc}
           src={currentSrc}
@@ -117,7 +110,6 @@ export default function MediaCarousel({
           priority={i === 0}
         />
 
-        {/* Controls */}
         {len > 1 && (
           <>
             <button

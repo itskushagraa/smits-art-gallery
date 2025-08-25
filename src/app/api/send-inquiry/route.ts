@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
-/* ---------- ENV ---------- */
 const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || "";
 
 const ses = new SESClient({
@@ -12,7 +11,6 @@ const ses = new SESClient({
   },
 });
 
-/* ---------- Types ---------- */
 type ArtworkMini = { slug: string; title: string } | null;
 type InquiryKind = "artwork" | "exhibition-commission" | "other";
 
@@ -20,16 +18,14 @@ type ECDetails = {
   org?: string | null;
   dates?: string | null;
   location?: string | null;
-  site?: string | null; // for exhibition
-  size?: string | null; // for commission
+  site?: string | null;
+  size?: string | null;
   deadline?: string | null;
   budget?: string | null;
   reference?: string | null;
 } | null;
 
-/* ---------- Utils ---------- */
 function pickClientIP(req: Request) {
-  // Do not rely on req.ip; use headers behind proxies
   const cf = req.headers.get("cf-connecting-ip");
   if (cf) return cf;
   const xr = req.headers.get("x-real-ip");
@@ -65,7 +61,6 @@ function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-/* ---------- Email bodies (HTML + text) ---------- */
 function textArtwork({ name, email, message, artwork }: { name: string; email: string; message: string; artwork: ArtworkMini }) {
   const artLine = artwork ? `Artwork: ${artwork.title}  (/${artwork.slug})` : "Artwork: (none selected)";
   return `New Artwork inquiry from smitsartstudio.com
@@ -246,7 +241,6 @@ function htmlOther({ name, email, subject, message }: { name: string; email: str
 </html>`;
 }
 
-/* ---------- Handler ---------- */
 export async function POST(req: Request) {
   try {
     const ip = pickClientIP(req);
@@ -263,15 +257,12 @@ export async function POST(req: Request) {
     const hp = String(body?.hp || "");
     const turnstileToken = String(body?.turnstileToken || "");
 
-    // honeypot: silently succeed
     if (hp) return NextResponse.json({ success: true });
 
-    // basic validation
     if (!name || !email || !message) {
       return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
     }
 
-    // Turnstile verification
     const ver = await verifyTurnstile(turnstileToken, ip);
     if (!ver.ok) {
       const msg =
@@ -283,7 +274,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: msg }, { status: ver.reason === "missing-secret" ? 500 : 400 });
     }
 
-    // Build subject + bodies
     let subject = "New Inquiry";
     let html = "";
     let text = "";
@@ -303,7 +293,6 @@ export async function POST(req: Request) {
       text = textOther({ name, email, subject: otherSubject, message });
     }
 
-    // Send via SES (exactly as before)
     const send = new SendEmailCommand({
       Source: process.env.SES_FROM || "no-reply@smitsartstudio.com",
       Destination: { ToAddresses: [process.env.SES_TO || "contact@smitsartstudio.com"] },

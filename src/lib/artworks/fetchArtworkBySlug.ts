@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 
 type Category = "figurative" | "landscape" | "abstract" | "prints";
 
-export type DbArtwork = {
+export type DbArtwork = { 
   slug: string;
   title: string;
   category: Category;

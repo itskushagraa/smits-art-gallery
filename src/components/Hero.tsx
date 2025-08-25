@@ -1,4 +1,3 @@
-// components/Hero.tsx
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,7 +7,7 @@ import { useSwipeable } from "react-swipeable";
 
 const AUTOPLAY_MS = 4000;
 const TRANSPARENT_PIXEL =
-  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="; // ★
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
 
 const gradCache = new Map<string, string>();
 
@@ -132,12 +131,10 @@ export default function Hero({ slides }: { slides: string[] }) {
     })();
 
     return () => { aborted = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, slides]);
 
   if (total === 0) return null;
 
-  // ★ Only load the current and the immediate next slide; others are a transparent 1px.
   const nextIndex = (index + 1) % total;
   const srcFor = (i: number) =>
     i === index || i === nextIndex ? slides[i] : TRANSPARENT_PIXEL;
@@ -151,7 +148,6 @@ export default function Hero({ slides }: { slides: string[] }) {
       onMouseLeave={() => setPaused(false)}
       aria-label="Featured interiors slideshow"
     >
-      {/* Slides (stacked, cross-fade) */}
       <div className="absolute inset-0">
         {slides.map((src, i) => (
           <div
@@ -160,11 +156,11 @@ export default function Hero({ slides }: { slides: string[] }) {
             aria-hidden={i !== index}
           >
             <NextImage
-              src={srcFor(i)}                // ★ stable transitions; non-active use 1×1
+              src={srcFor(i)}               
               alt=""
               fill
-              unoptimized                    // ★ hit Supabase Smart CDN directly
-              priority={i === index}         // ★ only active slide is eager
+              unoptimized 
+              priority={i === index}
               className="object-cover"
               sizes="100vw"
             />
@@ -173,7 +169,6 @@ export default function Hero({ slides }: { slides: string[] }) {
         ))}
       </div>
 
-      {/* Content (unchanged) */}
       <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center">
         <h1 className="font-sans text-4xl font-light leading-tight uppercase text-white md:text-6xl">
           SmitsArtStudio<br className="hidden md:block" />
@@ -182,7 +177,6 @@ export default function Hero({ slides }: { slides: string[] }) {
           Art that embodies wholeness and spiritual resonance through
         </p>
 
-        {/* Gradient button cross-fade (unchanged) */}
         <button
           onClick={() => router.push("/works")}
           className="relative mt-8 overflow-hidden rounded-xl px-6 py-3 font-extralight uppercase text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-white/60"
@@ -203,7 +197,6 @@ export default function Hero({ slides }: { slides: string[] }) {
         </button>
       </div>
 
-      {/* Controls (unchanged) */}
       <div className="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex items-center justify-center">
         <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-black/35 px-3 py-2 backdrop-blur">
           <button

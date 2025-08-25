@@ -18,7 +18,6 @@ body {
     overscroll-behavior-y: none;
 }
 
-/* About page background cross-fade */
 @keyframes about-bgfade {
     0% {
         opacity: 1;

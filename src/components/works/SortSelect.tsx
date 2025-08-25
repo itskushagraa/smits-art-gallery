@@ -21,7 +21,6 @@ export default function SortSelect({ value }: { value?: Sort }) {
     if (!v) next.delete("sort");
     else next.set("sort", v);
 
-    // reset pagination whenever sort changes
     next.delete("cursor");
 
     router.push(`${pathname}?${next.toString()}`, { scroll: false });

@@ -13,44 +13,37 @@ declare global {
 export default function ExhibitionCommissionForm({
   presetKind,
 }: {
-  presetKind?: Kind; // optionally force a starting tab
+  presetKind?: Kind;
 }) {
   const [kind, setKind] = useState<Kind>(presetKind || "exhibition");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
-  // shared optional fields
   const [org, setOrg] = useState("");
   const [dates, setDates] = useState("");
   const [location, setLocation] = useState("");
 
-  // diverging field: site (exhibition) OR size (commission)
-  const [site, setSite] = useState(""); // venue / site conditions
-  const [size, setSize] = useState(""); // dimensions / scope
+  const [site, setSite] = useState(""); 
+  const [size, setSize] = useState("");
 
   const [deadline, setDeadline] = useState("");
   const [budget, setBudget] = useState("");
-  const [reference, setReference] = useState(""); // link or short ref
+  const [reference, setReference] = useState("");
   const [message, setMessage] = useState("");
 
-  // UX
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // token gate
   const [tokenReady, setTokenReady] = useState(false);
 
-  // honeypot
   const [hp, setHp] = useState("");
 
   useEffect(() => {
     if (presetKind && presetKind !== kind) setKind(presetKind);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [presetKind]);
 
-  // keep tokenReady up-to-date (widget is kept mounted by ContactGate)
   useEffect(() => {
     const check = () => setTokenReady(Boolean(typeof window !== "undefined" && window.__turnstileToken));
     check();
@@ -70,7 +63,6 @@ export default function ExhibitionCommissionForm({
 
     setError("");
 
-    // block if token missing/expired
     const turnstileToken =
       (typeof window !== "undefined" && window.__turnstileToken) || "";
     if (!turnstileToken) {
@@ -82,7 +74,7 @@ export default function ExhibitionCommissionForm({
     try {
       const payload = {
         kind: "exhibition-commission",
-        subtype: kind, // "exhibition" | "commission"
+        subtype: kind,
         name,
         email,
         message,
@@ -108,7 +100,6 @@ export default function ExhibitionCommissionForm({
       const json = await res.json();
       if (json?.success) {
         setSent(true);
-        // optional reset
         setName("");
         setEmail("");
         setOrg("");
@@ -143,7 +134,6 @@ export default function ExhibitionCommissionForm({
 
   return (
     <form className="grid gap-5" onSubmit={onSubmit}>
-      {/* Kind switcher */}
       <div className="flex gap-2">
         <Toggle
           label="Exhibition"
@@ -157,7 +147,6 @@ export default function ExhibitionCommissionForm({
         />
       </div>
 
-      {/* Contact */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Field label="Your name">
           <input
@@ -180,7 +169,6 @@ export default function ExhibitionCommissionForm({
         </Field>
       </div>
 
-      {/* Shared optional info */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Field label="Organization (optional)">
           <input
@@ -209,7 +197,6 @@ export default function ExhibitionCommissionForm({
         />
       </Field>
 
-      {/* Diverging field */}
       {kind === "exhibition" ? (
         <Field label="Site conditions / venue notes (optional)">
           <input
@@ -273,7 +260,6 @@ export default function ExhibitionCommissionForm({
         />
       </Field>
 
-      {/* Honeypot */}
       <input
         name="company"
         value={hp}
@@ -305,7 +291,6 @@ export default function ExhibitionCommissionForm({
   );
 }
 
-/* UI primitive */
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="grid gap-2">

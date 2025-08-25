@@ -21,7 +21,6 @@ export default function InfoTooltip({
         <Info size={size} />
       </button>
 
-      {/* Tooltip bubble */}
       <span
         role="tooltip"
         className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-black/90 px-2 py-1 text-xs text-white opacity-0 shadow transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"

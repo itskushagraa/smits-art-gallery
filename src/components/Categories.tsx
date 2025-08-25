@@ -1,4 +1,3 @@
-// components/Categories.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { signedMediaUrl } from "@/lib/mediaUrl";
@@ -9,7 +8,6 @@ type Category = {
   slug: string;
 };
 
-// Use watermarked, private derivatives via the proxy
 const categories: Category[] = [
   {
     title: "Figurative",
@@ -22,7 +20,6 @@ const categories: Category[] = [
     slug: "landscape",
   },
   {
-    // temporary until clientwork is received
     title: "Abstract",
     image: signedMediaUrl("the-eye/full_1200_wm.webp"),
     slug: "abstract",

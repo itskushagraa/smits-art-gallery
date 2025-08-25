@@ -7,12 +7,10 @@ type Category = "figurative" | "landscape" | "abstract" | "prints";
 type DbArtwork = {
   slug: string;
   title: string;
-  // category & description not selected anymore (not needed for the grid)
   width_cm: number | null;
   height_cm: number | null;
   price: number | null;
   available: boolean | null;
-  // JSONB array; we only need to know if any item has kind === "interior"
   media: { kind: string; url?: string }[] | null;
 };
 
@@ -34,7 +32,6 @@ export async function fetchArtworks(opts: {
 }): Promise<Artwork[]> {
   let q = supabase
     .from("artwork")
-    // lean payload: only what the grid renders + media presence check
     .select("slug,title,width_cm,height_cm,price,available,media");
 
   if (opts.category) q = q.eq("category", opts.category);
@@ -54,7 +51,6 @@ export async function fetchArtworks(opts: {
 
   const items: Artwork[] = (data as DbArtwork[]).map((r) => {
     const interior = hasInterior(r.media);
-    // Build *derivative keys only*; UI will turn these into public CDN URLs.
     const fullKey = `${r.slug}/full_1200_wm.webp`;
     const interiorKey = interior ? `${r.slug}/interior_1200_wm.webp` : undefined;
 

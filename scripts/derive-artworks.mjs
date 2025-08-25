@@ -1,4 +1,3 @@
-// scripts/derive-artworks.mjs
 import 'dotenv/config';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -13,7 +12,6 @@ if (!URL || !SERVICE) {
 }
 const supabase = createClient(URL, SERVICE);
 
-// sizes to produce (longest side)
 const SIZES = [1600, 1200, 800, 480];
 
 async function download(bucket, objectPath) {
@@ -40,8 +38,8 @@ async function findFile(slug, baseName) {
 
 async function makeDerivative(masterBuf, wmBuf, targetW) {
   const wmScaled = await sharp(wmBuf)
-    .trim() // remove transparent padding
-    .resize({ width: Math.round(targetW * 0.60) }) // bigger mark
+    .trim()
+    .resize({ width: Math.round(targetW * 0.60) })
     .png()
     .toBuffer();
 
@@ -71,13 +69,11 @@ async function main() {
   const wmPath = path.resolve('public/watermark.png');
   const wmBuf = await fs.readFile(wmPath);
 
-  // FULL (required)
   const fullPath = await findFile(slug, 'full');
   if (!fullPath) throw new Error(`No full.* in artworks/${slug}`);
   const fullBuf = await download('artworks', fullPath);
   await buildSet(slug, 'full', fullBuf, wmBuf);
 
-  // INTERIOR (optional)
   const interiorPath = await findFile(slug, 'interior');
   if (interiorPath) {
     const interiorBuf = await download('artworks', interiorPath);

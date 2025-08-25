@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 
-// types
 export type ArtworkOption = {
   slug: string;
   title: string;
@@ -30,18 +29,14 @@ export default function ArtworkInquiryForm({
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<ArtworkOption | null>(null);
 
-  // UX state
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // token state (kept in sync so we can disable the button + show hint)
   const [tokenReady, setTokenReady] = useState<boolean>(false);
 
-  // honeypot
   const [hp, setHp] = useState("");
 
-  // keep tokenReady updated (ContactGate keeps widget mounted & auto‑refreshing)
   useEffect(() => {
     const check = () => setTokenReady(Boolean(typeof window !== "undefined" && window.__turnstileToken));
     check();
@@ -55,7 +50,6 @@ export default function ArtworkInquiryForm({
     };
   }, []);
 
-  // Preselect when artworks load or when preselectSlug changes
   useEffect(() => {
     if (!preselectSlug || !artworks?.length) return;
     const match = artworks.find((a) => a.slug === preselectSlug);
@@ -70,7 +64,6 @@ export default function ArtworkInquiryForm({
 
     setError("");
 
-    // grab current token and block if missing/expired
     const turnstileToken =
       (typeof window !== "undefined" && window.__turnstileToken) || "";
 
@@ -97,7 +90,6 @@ export default function ArtworkInquiryForm({
       const json = await res.json();
       if (json?.success) {
         setSent(true);
-        // optional: clear fields
         setName("");
         setEmail("");
         setMessage("");
@@ -124,7 +116,6 @@ export default function ArtworkInquiryForm({
 
   return (
     <form className="grid gap-5" onSubmit={onSubmit}>
-      {/* Name + Email */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <Field label="Your name">
           <input
@@ -148,7 +139,6 @@ export default function ArtworkInquiryForm({
         </Field>
       </div>
 
-      {/* Artwork dropdown */}
       <Field label="Select artwork">
         <ThumbnailSelect
           options={artworks}
@@ -158,7 +148,6 @@ export default function ArtworkInquiryForm({
         />
       </Field>
 
-      {/* Message */}
       <Field label="Your message">
         <textarea
           value={message}
@@ -170,7 +159,6 @@ export default function ArtworkInquiryForm({
         />
       </Field>
 
-      {/* Honeypot (hidden) */}
       <input
         name="company"
         value={hp}
@@ -181,7 +169,6 @@ export default function ArtworkInquiryForm({
         aria-hidden="true"
       />
 
-      {/* Submit */}
       <div className="pt-2">
         <button
           type="submit"
@@ -202,8 +189,6 @@ export default function ArtworkInquiryForm({
     </form>
   );
 }
-
-/* ---------- small UI primitives ---------- */
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -230,7 +215,6 @@ function ThumbnailSelect({
   const listRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState<number>(-1);
 
-  // close on outside click
   useEffect(() => {
     function onDoc(e: MouseEvent) {
       if (!open) return;
@@ -241,7 +225,6 @@ function ThumbnailSelect({
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
-  // keyboard navigation
   function onKey(e: React.KeyboardEvent) {
     if (!open) {
       if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {

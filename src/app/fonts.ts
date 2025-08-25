@@ -1,4 +1,3 @@
-// src/app/fonts.ts
 import { Lato, Cormorant_Garamond } from "next/font/google";
 
 export const lato = Lato({

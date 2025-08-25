@@ -18,10 +18,8 @@ export default function OtherInquiryForm() {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // honeypot
   const [hp, setHp] = useState("");
 
-  // token state
   const [tokenReady, setTokenReady] = useState(false);
 
   useEffect(() => {
@@ -140,7 +138,6 @@ export default function OtherInquiryForm() {
         />
       </Field>
 
-      {/* Honeypot (hidden) */}
       <input
         name="company"
         value={hp}
