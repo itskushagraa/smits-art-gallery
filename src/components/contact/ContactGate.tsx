@@ -99,7 +99,7 @@ export default function ContactGate({ slides }: { slides: string[] }) {
                 "expired-callback": () => window.onTurnstileExpired?.(),
                 "error-callback": () => window.onTurnstileError?.(),
             });
-        } catch (e) {
+        } catch {
             setWidgetError("Failed to initialize verification widget.");
         }
     }, [verified, siteKey]);

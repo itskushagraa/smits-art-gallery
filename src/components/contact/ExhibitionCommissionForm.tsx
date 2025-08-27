@@ -42,7 +42,7 @@ export default function ExhibitionCommissionForm({
 
   useEffect(() => {
     if (presetKind && presetKind !== kind) setKind(presetKind);
-  }, [presetKind]);
+  }, [presetKind, kind]);
 
   useEffect(() => {
     const check = () => setTokenReady(Boolean(typeof window !== "undefined" && window.__turnstileToken));

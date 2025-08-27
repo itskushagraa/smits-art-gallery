@@ -131,7 +131,7 @@ export default function Hero({ slides }: { slides: string[] }) {
     })();
 
     return () => { aborted = true; };
-  }, [index, slides]);
+  }, [index, slides, showA]);
 
   if (total === 0) return null;
 

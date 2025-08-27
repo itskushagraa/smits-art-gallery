@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSwipeable } from "react-swipeable";
 import { mediaUrl } from "@/lib/mediaUrl";
 
@@ -36,9 +36,9 @@ export default function MediaCarousel({
   const [i, setI] = useState(0);
   const len = resolvedSlides.length || 0;
 
-  const next = () => setI((v) => (v + 1) % len);
-  const prev = () => setI((v) => (v - 1 + len) % len);
-
+  const next = useCallback(() => setI(v => (v + 1) % len), [len]);
+  const prev = useCallback(() => setI(v => (v - 1 + len) % len), [len]);
+  
   const swipe = useSwipeable({
     onSwipedLeft: () => len && next(),
     onSwipedRight: () => len && prev(),
@@ -56,7 +56,7 @@ export default function MediaCarousel({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [len]);
+  }, [len, next, prev]);
 
   const boxStyle: React.CSSProperties = {
     height: `clamp(${minPx}px, ${maxVh}svh, ${maxPx}px)`,
